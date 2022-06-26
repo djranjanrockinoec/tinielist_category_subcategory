@@ -6,10 +6,12 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.tinie.GetCatSubcat.exceptions.UnauthorisedException;
 import com.tinie.GetCatSubcat.repositories.LoginEntryRepository;
 import com.tinie.GetCatSubcat.util.EnvConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class JWTProcessor {
 
     @Autowired
@@ -24,8 +26,11 @@ public class JWTProcessor {
 
         var loginEntryOptional = loginEntryRepository
                 .findByPhoneNumber(Long.parseLong(decodedJwt.getSubject()));
-        if (loginEntryOptional.isEmpty() || decodedJwt.getIssuedAt().getTime() < loginEntryOptional.get().getLastLogin())
+        if (loginEntryOptional.isEmpty() || decodedJwt.getIssuedAt().getTime() < loginEntryOptional.get().getLastLogin()) {
+            log.error("LoginEntry empty: " + loginEntryOptional.isEmpty());
+            log.error("JWT issued at: " + decodedJwt.getIssuedAt());
             throw new UnauthorisedException("Invalid Token", Long.parseLong(decodedJwt.getSubject()));
+        }
 
         return decodedJwt;
     }

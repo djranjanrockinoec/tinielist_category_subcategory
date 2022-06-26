@@ -64,6 +64,7 @@ public class AuthorisationFilter extends BasicAuthenticationFilter {
                 DecodedJWT decodedJWT = tokenProcessor.verifyAndDecodeToken(token);
                 return Long.valueOf(decodedJWT.getSubject());
             } catch(Exception e){
+                logger.error(e);
                 unauthorisedResponse.setMessage("Invalid Token");
             }
         } else unauthorisedResponse.setMessage("Request must be authenticated");
